@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusOps | Autonomous Incident Commander & Enterprise Knowledge Brain</title>
+  <meta name="description" content="FalkorDB-powered multi-agent incident triage, graph causality reasoning, and episodic memory. Built for Graph Hacks 2026.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Cytoscape for Graph Visualization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient cyber background glow -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-icon">
+        <i data-lucide="network"></i>
+        <span class="pulse-ring"></span>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">Nexus<span>Ops</span></div>
+        <div class="brand-subtitle">Autonomous Incident Commander • FalkorDB Graph</div>
+      </div>
+    </div>
+
+    <!-- Track Badges -->
+    <div class="track-badges">
+      <span class="badge badge-t1" title="Multi-hop blast radius & graph algorithms"><i data-lucide="git-fork"></i> Track 1: Connected Data</span>
+      <span class="badge badge-t2" title="Episodic memory & agent coordination"><i data-lucide="brain"></i> Track 2: Agent Memory</span>
+      <span class="badge badge-t3" title="People, code commits & architecture decisions"><i data-lucide="building-2"></i> Track 3: Company Brain</span>
+    </div>
+
+    <!-- System Status & Controls -->
+    <div class="header-actions">
+      <div id="dbStatusBadge" class="status-badge status-loading" onclick="openDbModal()">
+        <span class="status-dot"></span>
+        <span id="dbStatusText">Checking FalkorDB...</span>
+        <i data-lucide="settings" class="icon-small"></i>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openDbModal()">
+        <i data-lucide="database"></i> DB Config
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Mission Control Layout -->
+  <main class="dashboard-grid">
+    
+    <!-- LEFT PANEL: Incident Control & Graph Tools -->
+    <aside class="panel left-panel">
+      
+      <!-- Incident Simulation Section -->
+      <div class="card incident-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i data-lucide="flame" class="icon-red"></i> Incident Commander
+          </div>
+          <span class="live-indicator">LIVE SWARM</span>
+        </div>
+        <p class="card-desc">Trigger a real-time cascade outage to watch the multi-agent swarm traverse the graph, deduce root cause, and recall memory.</p>
+
+        <div class="incident-presets">
+          <button class="btn-scenario active" onclick="triggerScenario('payment-service', 'P0 Payment Gateway Cascade: HTTP 504 Timeouts', '18.4% error rate, redis pool saturated')">
+            <div class="scenario-meta">
+              <span class="pill pill-p0">P0</span>
+              <span class="scenario-name">Payment Gateway Timeout</span>
+            </div>
+            <span class="scenario-detail">Cascades: orders-service → api-gateway</span>
+          </button>
+
+          <button class="btn-scenario" onclick="triggerScenario('kafka-event-bus', 'P1 Event Bus Broker Partition Lag', 'Message lag > 450,000 events, partition rebalance')">
+            <div class="scenario-meta">
+              <span class="pill pill-p1">P1</span>
+              <span class="scenario-name">Kafka Lag Cascade</span>
+            </div>
+            <span class="scenario-detail">Cascades: notification-worker → reporting</span>
+          </button>
+
+          <button class="btn-scenario" onclick="triggerScenario('auth-service', 'P1 Auth Token Issuer Latency Surge', 'JWT signing latency 3200ms')">
+            <div class="scenario-meta">
+              <span class="pill pill-p1">P1</span>
+              <span class="scenario-name">Auth Cluster Spike</span>
+            </div>
+            <span class="scenario-detail">Cascades: all tier-1 ingress calls</span>
+          </button>
+        </div>
+
+        <button id="runIncidentBtn" class="btn btn-primary btn-block" onclick="runSimulateIncident()">
+          <i data-lucide="zap"></i> Launch Multi-Agent Triage
+        </button>
+      </div>
+
+      <!-- Quick Graph Tools -->
+      <div class="card tools-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i data-lucide="cpu" class="icon-cyan"></i> Graph Tools Catalogue
+          </div>
+          <span class="badge-subtle">6 Typed Tools</span>
+        </div>
+
+        <div class="tool-list">
+          <div class="tool-item" onclick="runToolBlastRadius()">
+            <div class="tool-info">
+              <div class="tool-name"><i data-lucide="activity"></i> Blast Radius Traversal</div>
+              <div class="tool-signature">[:DEPENDS_ON*1..3] upstream hops</div>
+            </div>
+            <i data-lucide="chevron-right" class="chevron"></i>
+          </div>
+
+          <div class="tool-item" onclick="runToolPageRank()">
+            <div class="tool-info">
+              <div class="tool-name"><i data-lucide="shield-alert"></i> PageRank Centrality (SPOF)</div>
+              <div class="tool-signature">FalkorDB PageRank algorithm</div>
+            </div>
+            <i data-lucide="chevron-right" class="chevron"></i>
+          </div>
+
+          <div class="tool-item" onclick="runToolShortestPath()">
+            <div class="tool-info">
+              <div class="tool-name"><i data-lucide="git-commit"></i> Shortest Path Root Cause</div>
+              <div class="tool-signature">shortestPath((s)-[*]-(commit))</div>
+            </div>
+            <i data-lucide="chevron-right" class="chevron"></i>
+          </div>
+
+          <div class="tool-item" onclick="runToolOwnership()">
+            <div class="tool-info">
+              <div class="tool-name"><i data-lucide="users"></i> Who to Wake at 3 AM?</div>
+              <div class="tool-signature">(Person)-[:ON_CALL_FOR]->(Service)</div>
+            </div>
+            <i data-lucide="chevron-right" class="chevron"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph Metrics Summary -->
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-val" id="metricNodes">--</div>
+          <div class="metric-lbl">Graph Nodes</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="metricEdges">--</div>
+          <div class="metric-lbl">Relationships</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val" id="metricLatency">-- ms</div>
+          <div class="metric-lbl">Avg Cypher Speed</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER PANEL: Interactive Topology Graph Canvas -->
+    <section class="panel center-panel">
+      <div class="canvas-header">
+        <div class="canvas-title-group">
+          <span class="canvas-title"><i data-lucide="orbit"></i> Topology & Causality Visualizer</span>
+          <span id="canvasFilterLabel" class="canvas-sub">Viewing Enterprise Microservices Graph</span>
+        </div>
+        <div class="canvas-controls">
+          <button class="btn btn-icon" onclick="cyFit()" title="Fit Graph"><i data-lucide="maximize-2"></i></button>
+          <button class="btn btn-icon" onclick="cyReset()" title="Reset Layout"><i data-lucide="rotate-ccw"></i></button>
+          <button class="btn btn-icon" onclick="reloadGraph()" title="Refresh Graph"><i data-lucide="refresh-cw"></i></button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="graph-legend">
+        <div class="legend-item"><span class="legend-dot dot-service"></span> Tier-1 Service</div>
+        <div class="legend-item"><span class="legend-dot dot-infra"></span> DB / Infrastructure</div>
+        <div class="legend-item"><span class="legend-dot dot-person"></span> Engineer / On-Call</div>
+        <div class="legend-item"><span class="legend-dot dot-commit"></span> Code Commit</div>
+        <div class="legend-item"><span class="legend-dot dot-doc"></span> Runbook / ADR</div>
+      </div>
+
+      <!-- Cytoscape Container -->
+      <div id="cy" class="cytoscape-container"></div>
+
+      <!-- Active Node Inspector Drawer -->
+      <div id="nodeDrawer" class="node-drawer hidden">
+        <div class="drawer-header">
+          <div class="drawer-title" id="drawerTitle">Node Details</div>
+          <button class="btn-close" onclick="closeDrawer()"><i data-lucide="x"></i></button>
+        </div>
+        <div class="drawer-body" id="drawerContent">
+          <!-- Dynamic node properties loaded here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Multi-Agent Deliberation & Memory Feed -->
+    <aside class="panel right-panel">
+      <!-- Tabs Header -->
+      <div class="tabs-nav">
+        <button id="tabDeliberation" class="tab-btn active" onclick="switchTab('deliberation')">
+          <i data-lucide="message-square-code"></i> Agent Swarm
+        </button>
+        <button id="tabMemory" class="tab-btn" onclick="switchTab('memory')">
+          <i data-lucide="archive"></i> Episodic Memory
+        </button>
+        <button id="tabCypher" class="tab-btn" onclick="switchTab('cypher')">
+          <i data-lucide="terminal"></i> Cypher Sandbox
+        </button>
+      </div>
+
+      <!-- TAB 1: Agent Deliberation Timeline -->
+      <div id="viewDeliberation" class="tab-content active">
+        <div class="deliberation-header">
+          <span class="d-title">Agent Deliberation Trace</span>
+          <span id="deliberationTiming" class="d-timing">Idle</span>
+        </div>
+        
+        <div id="agentFeed" class="agent-feed">
+          <div class="feed-placeholder">
+            <i data-lucide="bot"></i>
+            <p>Click <strong>"Launch Multi-Agent Triage"</strong> to see the Sentinel, Root Cause, and Remediation agents coordinate over FalkorDB in real time.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Episodic Memory Vault (Track 2) -->
+      <div id="viewMemory" class="tab-content">
+        <div class="memory-header">
+          <div class="memory-title-group">
+            <span class="d-title">FalkorDB Memory Graph</span>
+            <span class="d-timing">multigraph: nexus_incident_memory</span>
+          </div>
+          <p class="memory-desc">Every triage decision and verified remediation writes back to the graph so the agent remembers across sessions.</p>
+        </div>
+
+        <div class="search-box">
+          <i data-lucide="search"></i>
+          <input type="text" id="memorySearchInput" placeholder="Search symptom memory (e.g. 'connection pool', 'timeout')..." onkeydown="if(event.key==='Enter') searchMemory()">
+          <button class="btn btn-secondary btn-sm" onclick="searchMemory()">Query</button>
+        </div>
+
+        <div id="memoryList" class="memory-list">
+          <!-- Memory nodes populated dynamically -->
+        </div>
+      </div>
+
+      <!-- TAB 3: Cypher Query Sandbox -->
+      <div id="viewCypher" class="tab-content">
+        <div class="cypher-header">
+          <span class="d-title">Cypher Developer Console</span>
+          <span class="d-timing">Direct Engine Execution</span>
+        </div>
+
+        <div class="preset-queries">
+          <label>Load Example Query:</label>
+          <select id="querySelect" onchange="loadPresetQuery()">
+            <option value="q1">1. Multi-hop Blast Radius (*1..3)</option>
+            <option value="q2">2. Who Owns & On-Call for Payment Service</option>
+            <option value="q3">3. Shortest Path to Breaking Commit</option>
+            <option value="q4">4. PageRank Centrality Ranking</option>
+            <option value="q5">5. Episodic Incident Memories</option>
+          </select>
+        </div>
+
+        <div class="cypher-editor-container">
+          <textarea id="cypherInput" class="cypher-editor" rows="5"></textarea>
+          <div class="editor-actions">
+            <span id="cypherExecTime" class="query-latency">-- ms</span>
+            <button class="btn btn-primary btn-sm" onclick="runCustomCypher()">
+              <i data-lucide="play"></i> Execute Cypher
+            </button>
+          </div>
+        </div>
+
+        <div class="cypher-results-container">
+          <div class="results-header">Output Table:</div>
+          <div id="cypherResultsTable" class="results-table-wrap">
+            <div class="table-empty">Run a Cypher query to see graph records.</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- DATABASE SETTINGS MODAL -->
+  <div id="dbModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title"><i data-lucide="database"></i> FalkorDB Connection Settings</div>
+        <button class="btn-close" onclick="closeDbModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Connect live to your FalkorDB Cloud instance or test locally. Your cloud endpoint is pre-configured.</p>
+        
+        <div class="form-group">
+          <label>FalkorDB Host / Endpoint</label>
+          <input type="text" id="cfgHost" class="form-input" value="r-6jissuruar.instance-94olzko8f.hc-7up0crkyn.ap-south-1.aws.f2e0a955bb84.cloud">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Port</label>
+            <input type="number" id="cfgPort" class="form-input" value="63782">
+          </div>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="cfgUser" class="form-input" value="default">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Database Password (from FalkorDB Cloud Dashboard)</label>
+          <input type="password" id="cfgPassword" class="form-input" placeholder="Paste database password here...">
+          <span class="field-hint">Check your FalkorDB Cloud database details card for the database instance password.</span>
+        </div>
+
+        <div id="dbModalAlert" class="modal-alert hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDbModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDbConnection()">
+          <i data-lucide="plug"></i> Connect & Test Live
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
